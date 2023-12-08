@@ -1,0 +1,3 @@
+CREATE TABLE Customers (
+  Id STRING(32) NOT NULL
+) PRIMARY KEY (Id);

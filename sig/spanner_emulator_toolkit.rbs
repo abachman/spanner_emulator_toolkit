@@ -1,4 +1,27 @@
 module SpannerEmulatorToolkit
   VERSION: String
   # See the writing guide of rbs: https://github.com/ruby/rbs#guides
+
+  # configuration.rb
+  def self.configure: () { (SpannerEmulatorToolkit::Configuration) -> void } -> void
+  def self.logger: () -> Logger
+
+  # client.rb
+  def self.project: () -> Google::Cloud::Spanner::Project
+  def self.client: () -> Google::Cloud::Spanner::Client
+  def self.instance: () -> Google::Cloud::Spanner::Instance
+  def self.database: () -> Google::Cloud::Spanner::Database
+
+  def self.instance_exists?: () -> bool
+  def self.database_exists?: () -> bool
+
+  def self.create_instance: () -> void
+  def self.drop_instance: () -> void
+  def self.create_database: () -> void
+  def self.drop_database: () -> void
+
+  def self.database_path: () -> String
+
+  # reset_sessions.rb
+  def self.reset_sessions!: () -> void
 end

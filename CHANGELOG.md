@@ -2,8 +2,6 @@
 
 Initial release.
 
-- configurable toolkit class, requires `project_id` and `emulator_host` to be set
-- simple client methods: `create_instance`, `create_database`, `drop_instance`, `drop_database`
-- session reset method for all instances and databases of the configured project and emulator: `reset_sessions!`
-
-## [Unreleased]
+- Global configuration with `SpannerEmulatorToolkit.configure { |config| ... }` or ENV vars
+- Google::Cloud::Spanner client methods: `create_instance`, `create_database`, `drop_instance`, `drop_database`
+- `reset_session!` to reset transactions all instances and databases of the configured project and emulator

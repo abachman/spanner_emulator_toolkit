@@ -16,8 +16,26 @@ RSpec.describe SpannerEmulatorToolkit do
   RSpec.shared_examples "no instance available" do
     it_behaves_like "no database available"
 
-    it "instance_connection returns nil" do
-      expect(described_class.instance_connection).to be_nil
+    it "instance returns nil" do
+      expect(described_class.instance).to be_nil
+    end
+  end
+
+  RSpec.shared_examples "instance available" do
+    it "provides a Spanner instance connection" do
+      expect(described_class.instance).to(
+        be_a(Google::Cloud::Spanner::Instance)
+      )
+    end
+  end
+
+  RSpec.shared_examples "database available" do
+    it_behaves_like "instance available"
+
+    it "provides a Spanner database connection" do
+      expect(described_class.database).to(
+        be_a(Google::Cloud::Spanner::Database)
+      )
     end
   end
 
@@ -38,7 +56,7 @@ RSpec.describe SpannerEmulatorToolkit do
   end
 
   it "provides a Spanner project connection" do
-    expect(described_class.project_connection).to(
+    expect(described_class.project).to(
       be_a(Google::Cloud::Spanner::Project)
     )
   end
@@ -53,6 +71,7 @@ RSpec.describe SpannerEmulatorToolkit do
     end
 
     it_behaves_like "no database available"
+    it_behaves_like "instance available"
 
     it { is_expected.to be_instance_exists }
     it { is_expected.to_not be_database_exists }
@@ -74,6 +93,8 @@ RSpec.describe SpannerEmulatorToolkit do
 
       it { is_expected.to be_instance_exists }
       it { is_expected.to be_database_exists }
+
+      it_behaves_like "database available"
 
       it "provides a Spanner client" do
         expect(described_class.client).to(
@@ -97,7 +118,7 @@ RSpec.describe SpannerEmulatorToolkit do
 
     describe "#create_instance" do
       before do
-        allow(described_class).to receive(:project_connection).and_return(mock_project)
+        allow(described_class).to receive(:project).and_return(mock_project)
       end
 
       it "creates an instance if none exists" do
@@ -109,8 +130,8 @@ RSpec.describe SpannerEmulatorToolkit do
 
     describe "#create_database" do
       before do
-        allow(described_class).to receive(:project_connection).and_return(mock_project)
-        allow(described_class).to receive(:instance_connection).and_return(mock_instance)
+        allow(described_class).to receive(:project).and_return(mock_project)
+        allow(described_class).to receive(:instance).and_return(mock_instance)
       end
 
       it "creates an instance if none exists" do

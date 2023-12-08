@@ -20,6 +20,9 @@ RSpec.configure do |config|
       config.instance_id = "test-instance"
       config.database_id = "test-database-#{Time.now.to_i}"
       config.emulator_host = "localhost:9010"
+
+      config.logger = Logger.new("/dev/null")
+      config.log_level = Logger::FATAL
     end
   end
 end

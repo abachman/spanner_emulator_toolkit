@@ -7,8 +7,10 @@ module SpannerEmulatorToolkit
     attr_accessor :logger, :log_level
 
     def initialize
+      @project_id = "example-project"
       @instance_id = "example-instance"
       @database_id = "example-database"
+      @emulator_host = "localhost:9010"
     end
 
     def validate!
@@ -40,13 +42,13 @@ module SpannerEmulatorToolkit
     def colorized(text, logger_severity)
       case logger_severity
       when "ERROR"
-        "\e[31m#{text}\e[0m"
+        "\e[31;1m#{text}\e[0m"
       when "DEBUG"
-        "\e[32m#{text}\e[0m"
+        "\e[32;1m#{text}\e[0m"
       when "WARN"
-        "\e[33m#{text}\e[0m"
+        "\e[33;1m#{text}\e[0m"
       when "INFO"
-        "\e[34m#{text}\e[0m"
+        "\e[34;1m#{text}\e[0m"
       else
         text
       end
@@ -57,7 +59,7 @@ module SpannerEmulatorToolkit
         self.logger = Logger.new($stdout)
         logger.formatter = proc do |severity, datetime, progname, msg|
           [
-            colorized("[SpannerEmulatorToolkit #{datetime.strftime("%Y-%m-%d %H:%M:%S")}]", severity),
+            "[SpannerEmulatorToolkit #{datetime.strftime("%Y-%m-%d %H:%M:%S")}]",
             colorized(severity, severity),
             msg
           ].join(" ") + "\n"

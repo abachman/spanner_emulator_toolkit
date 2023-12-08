@@ -6,4 +6,4 @@ SpannerEmulatorToolkit.configure do |config|
   config.log_level = Logger::DEBUG
 end
 
-SpannerEmulatorToolkit.reset_sessions!
+SpannerEmulatorToolkit.drop_instance

@@ -7,8 +7,10 @@ module SpannerEmulatorToolkit
   def self.logger: () -> Logger
 
   # client.rb
-  def self.project_connection: () -> Google::Cloud::Spanner::Project
+  def self.project: () -> Google::Cloud::Spanner::Project
   def self.client: () -> Google::Cloud::Spanner::Client
+  def self.instance: () -> Google::Cloud::Spanner::Instance
+  def self.database: () -> Google::Cloud::Spanner::Database
 
   def self.instance_exists?: () -> bool
   def self.database_exists?: () -> bool

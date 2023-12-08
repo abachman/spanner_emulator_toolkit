@@ -7,6 +7,8 @@ module SpannerEmulatorToolkit
   class << self
     # raises error unless database already exists
     def client
+      configuration.validate!
+
       thread_local_client
     end
 
@@ -16,23 +18,27 @@ module SpannerEmulatorToolkit
       self
     end
 
-    def project_connection
+    def project
       configuration.validate!
 
-      thread_local_project_connection
+      thread_local_project
     end
 
     # returns nil unless instance already exists
-    def instance_connection
-      project_connection.instance(configuration.instance_id)
+    def instance
+      project.instance(configuration.instance_id)
+    end
+
+    def database
+      instance&.database(configuration.database_id)
     end
 
     def instance_exists?
-      !instance_connection.nil?
+      !instance.nil?
     end
 
     def database_exists?
-      !instance_connection&.database(configuration.database_id).nil?
+      !instance&.database(configuration.database_id).nil?
     end
 
     # no-op if instance already exists
@@ -40,7 +46,7 @@ module SpannerEmulatorToolkit
       return if instance_exists?
 
       logger.debug "creating instance: #{configuration.instance_id}"
-      project_connection.create_instance(
+      project.create_instance(
         configuration.instance_id, name: configuration.instance_id
       ).wait_until_done!
     end
@@ -48,7 +54,8 @@ module SpannerEmulatorToolkit
     def drop_instance
       return unless instance_exists?
 
-      instance_connection.delete
+      logger.debug "dropping instance: #{configuration.instance_id}"
+      instance.delete
     end
 
     # no-op if database already exists
@@ -58,7 +65,7 @@ module SpannerEmulatorToolkit
       create_instance
 
       logger.debug "creating database: #{configuration.database_id}"
-      instance_connection.create_database(
+      instance.create_database(
         configuration.database_id,
         statements: configuration.schema_statements
       ).wait_until_done!
@@ -67,6 +74,7 @@ module SpannerEmulatorToolkit
     def drop_database
       return unless database_exists?
 
+      logger.debug "dropping database: #{configuration.database_id}"
       client.database.drop
     end
 
@@ -79,18 +87,18 @@ module SpannerEmulatorToolkit
     # ensure that multiple threads do not share the same client instance
     def thread_local_client
       @client ||= Concurrent::ThreadLocalVar.new(nil)
-      @client.value ||= project_connection.client(configuration.instance_id, configuration.database_id)
+      @client.value ||= project.client(configuration.instance_id, configuration.database_id)
       @client.value
     end
 
     # ensure that multiple threads do not share the same project connection instance
-    def thread_local_project_connection
-      @project_connection ||= Concurrent::ThreadLocalVar.new(nil)
-      @project_connection.value ||= Google::Cloud::Spanner.new(
+    def thread_local_project
+      @project ||= Concurrent::ThreadLocalVar.new(nil)
+      @project.value ||= Google::Cloud::Spanner.new(
         project_id: configuration.project_id,
         emulator_host: configuration.emulator_host
       )
-      @project_connection.value
+      @project.value
     end
   end
 end

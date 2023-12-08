@@ -9,7 +9,7 @@ module SpannerEmulatorToolkit
       configuration.validate!
 
       logger.debug "resetting sessions"
-      project_connection.instances.all do |instance|
+      project.instances.all do |instance|
         logger.debug "instance: #{instance.path}"
         instance.databases.all do |database|
           logger.debug "  database: #{database.path}"
